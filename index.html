@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lavly – Myyntiopas</title>
+  <style>
+    :root {
+      --pink: #e8527a;
+      --pink-light: #fde8ef;
+      --pink-mid: #f8b4c8;
+      --dark: #2d1f27;
+      --text: #3d2b35;
+      --muted: #7a5f6b;
+      --bg: #fff9fb;
+      --border: #f0d0db;
+      --sidebar-w: 260px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--dark);
+      color: #fff;
+      overflow-y: auto;
+      z-index: 100;
+      padding-bottom: 2rem;
+    }
+    .nav-logo {
+      padding: 1.6rem 1.4rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .nav-logo h1 { font-size: 1.3rem; font-weight: 700; color: var(--pink-mid); letter-spacing: 0.02em; }
+    .nav-logo p { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+    nav ul { list-style: none; padding: 0.6rem 0; }
+    nav ul li a {
+      display: block;
+      padding: 0.5rem 1.4rem;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 0.85rem;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    nav ul li a:hover, nav ul li a.active {
+      color: #fff;
+      background: rgba(255,255,255,0.06);
+      border-left-color: var(--pink);
+    }
+    nav ul li.section-title {
+      padding: 1rem 1.4rem 0.3rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── Main ── */
+    main { margin-left: var(--sidebar-w); flex: 1; padding: 0 0 4rem; }
+
+    .hero {
+      background: linear-gradient(135deg, var(--dark) 0%, #4a2035 100%);
+      color: #fff;
+      padding: 3rem 3rem 2.5rem;
+    }
+    .hero .badge {
+      display: inline-block;
+      background: var(--pink);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+    .hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+    .hero p { color: rgba(255,255,255,0.65); font-size: 1rem; max-width: 560px; }
+
+    .content { padding: 2.5rem 3rem; max-width: 860px; }
+
+    section { margin-bottom: 3.5rem; scroll-margin-top: 1.5rem; }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    h2 .icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      background: var(--pink-light);
+      color: var(--pink);
+      border-radius: 8px;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    h3 { font-size: 1rem; font-weight: 700; color: var(--dark); margin: 1.4rem 0 0.5rem; }
+
+    p { margin-bottom: 0.8rem; }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .card-title { font-weight: 700; font-size: 0.9rem; color: var(--dark); margin-bottom: 0.4rem; }
+
+    .steps { counter-reset: step; list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+    .steps li {
+      counter-increment: step;
+      display: flex;
+      gap: 0.9rem;
+      align-items: flex-start;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+    }
+    .steps li::before {
+      content: counter(step);
+      flex-shrink: 0;
+      width: 26px; height: 26px;
+      background: var(--pink);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    .bullets { list-style: none; display: flex; flex-direction: column; gap: 0.45rem; }
+    .bullets li { padding-left: 1.3rem; position: relative; font-size: 0.92rem; }
+    .bullets li::before { content: "🐾"; position: absolute; left: 0; font-size: 0.75rem; top: 2px; }
+
+    .msg-template {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.2rem;
+    }
+    .msg-header {
+      background: var(--pink-light);
+      padding: 0.7rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .msg-header span { font-weight: 700; font-size: 0.85rem; color: var(--pink); }
+    .copy-btn {
+      background: var(--pink);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .copy-btn:hover { opacity: 0.85; }
+    .msg-body { padding: 1rem 1.2rem; font-size: 0.88rem; white-space: pre-wrap; line-height: 1.65; }
+    .msg-body strong { color: var(--dark); }
+    .msg-note {
+      background: #fff8e1;
+      border-left: 3px solid #f0c040;
+      border-radius: 0 6px 6px 0;
+      padding: 0.5rem 0.8rem;
+      font-size: 0.82rem;
+      color: #6b5800;
+      margin: 0.6rem 1.2rem 1rem;
+    }
+
+    .info-box {
+      background: var(--pink-light);
+      border: 1px solid var(--pink-mid);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .info-box strong { color: var(--pink); }
+
+    .warning-box {
+      background: #fff3e0;
+      border: 1px solid #ffcc80;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      font-size: 0.88rem;
+      margin: 0.8rem 0;
+      color: #5d3800;
+    }
+    .warning-box strong { color: #e65100; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    th { background: var(--dark); color: #fff; padding: 0.7rem 1rem; text-align: left; font-size: 0.8rem; font-weight: 600; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--bg); }
+
+    .venue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }
+    .venue-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.1rem; }
+    .venue-card .city { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--pink); margin-bottom: 0.3rem; }
+    .venue-card .name { font-weight: 700; font-size: 0.9rem; color: var(--dark); margin-bottom: 0.25rem; }
+    .venue-card .addr { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; }
+    .venue-card .contact { font-size: 0.8rem; }
+    .venue-card .note { font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; border-top: 1px solid var(--border); padding-top: 0.4rem; }
+
+    .checklist { display: flex; flex-direction: column; gap: 0.5rem; }
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      font-size: 0.9rem;
+    }
+    .checklist-item input[type=checkbox] { width: 16px; height: 16px; margin-top: 3px; accent-color: var(--pink); flex-shrink: 0; cursor: pointer; }
+
+    .qa { display: flex; flex-direction: column; gap: 0.7rem; }
+    .qa-item { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .qa-q { background: var(--pink-light); padding: 0.6rem 1rem; font-weight: 700; font-size: 0.88rem; color: var(--dark); }
+    .qa-a { padding: 0.7rem 1rem; font-size: 0.88rem; }
+
+    .person-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.7rem; margin-bottom: 1rem; }
+    .person-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      font-size: 0.85rem;
+    }
+    .person-card .pname { font-weight: 700; color: var(--dark); margin-bottom: 0.25rem; }
+    .person-card .pnote { color: var(--muted); font-size: 0.82rem; }
+
+    .gmail-tip {
+      background: #f0f7ff;
+      border: 1px solid #b3d4f5;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    .gmail-tip strong { color: #0056b3; }
+
+    code {
+      background: #f3f0f5;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85em;
+      color: var(--dark);
+    }
+
+    .example-msg {
+      background: #f8f8f8;
+      border-left: 3px solid var(--pink);
+      border-radius: 0 8px 8px 0;
+      padding: 0.7rem 1rem;
+      font-size: 0.87rem;
+      font-style: italic;
+      margin: 0.6rem 0 1rem;
+    }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      main { margin-left: 0; }
+      .content { padding: 1.5rem; }
+      .hero { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<nav>
+  <div class="nav-logo">
+    <h1>🐾 Lavly</h1>
+    <p>Myyntiopas – Perehdytys</p>
+  </div>
+  <ul>
+    <li class="section-title">Aloitus</li>
+    <li><a href="#mikalavy">Mikä on Lavly?</a></li>
+    <li><a href="#tehtavat">Tehtäväsi lyhyesti</a></li>
+    <li><a href="#palkkio">Palkkiomalli</a></li>
+
+    <li class="section-title">Kasvattajien hankinta</li>
+    <li><a href="#mista">Mistä löydät kasvattajia?</a></li>
+    <li><a href="#kriteerit">Sopivan pentueeen kriteerit</a></li>
+    <li><a href="#tiimikysely">Tiimin aikataulujen varmistaminen</a></li>
+    <li><a href="#pentulista">AI-pentulistan käyttö</a></li>
+
+    <li class="section-title">Viestintä</li>
+    <li><a href="#gmailvinkit">Gmail-vinkit</a></li>
+    <li><a href="#viestipohja1">Viestipohja 1 – Pop-up</a></li>
+    <li><a href="#viestipohja2">Viestipohja 2 – Toimipisteet</a></li>
+    <li><a href="#viestipohja3">Viestipohja 3 – Kiinnostunut</a></li>
+    <li><a href="#viestityyli">Viestityyli & allekirjoitukset</a></li>
+
+    <li class="section-title">Myyntiprosessi</li>
+    <li><a href="#soittaminen">Kasvattajille soittaminen</a></li>
+    <li><a href="#etavierailu">Etätapaaminen</a></li>
+    <li><a href="#ukk">UKK – kasvattajien kysymykset</a></li>
+
+    <li class="section-title">Tilat</li>
+    <li><a href="#tilakysely">Tilakysely-viesti</a></li>
+    <li><a href="#tilat">Tilat kaupungeittain</a></li>
+
+    <li class="section-title">Muuta</li>
+    <li><a href="#tunnukset">Sähköpostitunnukset</a></li>
+    <li><a href="#kalenteri">Kalenteri</a></li>
+  </ul>
+</nav>
+
+<!-- ── MAIN ── -->
+<main>
+  <div class="hero">
+    <div class="badge">Perehdytysopas</div>
+    <h1>Tervetuloa Lavlyn tiimiin! 🩷</h1>
+    <p>Tässä oppaassa löydät kaiken mitä tarvitset: miten löydät kasvattajia, mitä sanot puhelimessa, valmiit viestit copy-pastettavaksi – sekä kaikkien tilojen yhteystiedot.</p>
+  </div>
+
+  <div class="content">
+
+    <!-- ─ MIKÄ ON LAVLY ─ -->
+    <section id="mikalavy">
+      <h2><span class="icon">🐶</span> Mikä on Lavly?</h2>
+      <p>Lavly järjestää <strong>pentujoogaa</strong> eri puolilla Suomea. Tunnit järjestetään yhteistyössä koirankasvattajien kanssa, jotka tuovat pentuensa tunnille.</p>
+      <p>Sinun tehtäväsi on etsiä sopivia kasvattajia, sopia yhteistyöstä heidän kanssaan ja varmistaa, että tunnit toteutuvat.</p>
+    </section>
+
+    <!-- ─ TEHTÄVÄT ─ -->
+    <section id="tehtavat">
+      <h2><span class="icon">✅</span> Tehtäväsi lyhyesti</h2>
+      <div class="checklist">
+        <label class="checklist-item"><input type="checkbox"><span><strong>1.</strong> Tarkista AI-pentulista päivittäin tai pari kertaa viikossa → täytä Excel → lähetä viestit</span></label>
+        <label class="checklist-item"><input type="checkbox"><span><strong>2.</strong> Soita niille kasvattajille, jotka eivät ole vastanneet viestiin 2–3 päivän kuluessa</span></label>
+        <label class="checklist-item"><input type="checkbox"><span><strong>3.</strong> Käy viestikeskustelut kiinnostuneiden kasvattajien kanssa ja sovi etävierailut</span></label>
+        <label class="checklist-item"><input type="checkbox"><span><strong>4.</strong> Selvitä aikataulut: kasvattaja + tila + Lavlyn työntekijät</span></label>
+        <label class="checklist-item"><input type="checkbox"><span><strong>5.</strong> Lyö tunti lukkoon kun kaikki aikataulut sopivat</span></label>
+        <label class="checklist-item"><input type="checkbox"><span><strong>6.</strong> Lisää uusi tunti Lavlyn yhteiseen kalenteriin</span></label>
+        <label class="checklist-item"><input type="checkbox"><span><strong>7.</strong> Lähetä kasvattajalle muistutusviesti päivää ennen tunteja</span></label>
+        <label class="checklist-item"><input type="checkbox"><span><strong>8.</strong> Lähetä kiitosviesti tunnin jälkeen</span></label>
+        <label class="checklist-item"><input type="checkbox"><span><strong>9.</strong> Käy läpi yksityistuntien kyselyt ja yritä sopia pentujoogatunnit niin, että yksityistunnit toteutuvat</span></label>
+      </div>
+      <div class="info-box" style="margin-top:1rem;">
+        <strong>Tavoite:</strong> Sovi tunnit parin viikon päähän. Minimietäisyys toteutuspäivään on 1,5 viikkoa. Vastaa kasvattajille aina maksimissaan 2 päivän sisällä.
+      </div>
+    </section>
+
+    <!-- ─ PALKKIO ─ -->
+    <section id="palkkio">
+      <h2><span class="icon">💰</span> Palkkiomalli</h2>
+      <table>
+        <thead><tr><th>Tilanne</th><th>Palkkio</th></tr></thead>
+        <tbody>
+          <tr><td>Uusi kasvattaja, sovittu ja toteutunut kerta (2 tuntia)</td><td><strong>100 €</strong></td></tr>
+          <tr><td>Lisätunti vanhan kasvattajan kanssa (2 tuntia)</td><td><strong>50 €</strong></td></tr>
+          <tr><td>Vanha kasvattaja ottaa itse yhteyttä (2 tuntia)</td><td><strong>50 €</strong></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ─ MISTÄ KASVATTAJIA ─ -->
+    <section id="mista">
+      <h2><span class="icon">🔍</span> Mistä löydät kasvattajia?</h2>
+      <div class="card">
+        <div class="card-title">AI-pentulista (ensisijainen)</div>
+        <p style="font-size:0.9rem;">Lavlyllä on oma pentulista, johon tekoäly kerää joka päivä sopivat pentueet Kennelliiton pentulistasta ja roturyhmien sivuilta.</p>
+        <a href="https://lavly26.github.io/pentulista/" target="_blank" style="color:var(--pink);font-weight:600;font-size:0.9rem;">→ Avaa pentulista</a>
+      </div>
+      <div class="card">
+        <div class="card-title">Muut kanavat</div>
+        <ul class="bullets">
+          <li><strong>Facebook-ryhmät</strong></li>
+          <li><strong>Instagram:</strong> selaa Lavlyn yhteistyökasvattajien seuraajalistoja – kasvattajat seuraavat toisiaan, joten sitä kautta löytyy uusia kasvattajia ja pentueita</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ─ KRITEERIT ─ -->
+    <section id="kriteerit">
+      <h2><span class="icon">📋</span> Sopivan pentueeen kriteerit</h2>
+      <p>Ennen kuin kontaktoit kasvattajaa, varmista että pentue täyttää nämä ehdot:</p>
+      <div class="card">
+        <div class="card-title">Peruskriteerit (tarkista heti)</div>
+        <ul class="bullets">
+          <li><strong>Pentumäärä:</strong> vähintään 4 pentua toimipistekaupungeissa (TRE, JKL, SJK, Lahti, Joensuu) tai vähintään 5 pentua muissa pop-up-kaupungeissa</li>
+          <li><strong>Luovutusajankohta:</strong> aikaisintaan 1,5 viikon päästä tästä hetkestä</li>
+          <li><strong>Matka tilaan:</strong> kasvattajan kotoa Lavlyn tilaan maksimissaan 45 minuuttia</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Kennelliittoon liittyvät kriteerit (tarkista vasta kun kasvattaja osoittaa kiinnostusta)</div>
+        <ul class="bullets">
+          <li>Kuuluu Suomen Kennelliittoon</li>
+          <li>On allekirjoittanut kasvattajasitoumuksen</li>
+          <li>Rekisteröi pennut</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ─ TIIMIN AIKATAULUT ─ -->
+    <section id="tiimikysely">
+      <h2><span class="icon">👥</span> Tiimin aikataulujen varmistaminen</h2>
+      <p>Kun sinulla on uudet tunnit suunnitteilla, varmista että Lavlyn tiimistä löytyy tekijät paikalle. Tämä hoidetaan <strong>Business WhatsAppin kaupunkikohtaisten ryhmien</strong> kautta.</p>
+
+      <p>Laita ryhmään kysely selkeillä vaihtoehdoilla:</p>
+      <div class="example-msg">
+        "Hei! Meillä on suunnitteilla pentujoogatunnit Tampereelle. Sopiko teille jokin näistä päivistä?<br>
+        ✅ Pääsen pe 4.7.<br>
+        ✅ Pääsen la 5.7.<br>
+        ❌ En pääse"
+      </div>
+
+      <div class="warning-box">
+        <strong>⚠️ Muista:</strong> Jos kyselyyn on kulunut yli 4 päivää ennen kuin tunti lyödään lopullisesti lukkoon, varmista vielä erikseen kyseisiltä henkilöiltä että ajankohta sopii edelleen.
+      </div>
+
+      <h3>Huomioitavaa tiimiläisistä</h3>
+      <div class="person-grid">
+        <div class="person-card">
+          <div class="pname">Katsu, Polina & Ada</div>
+          <div class="pnote">Eivät yleensä vastaa ryhmäkyselyihin, vaikka pystyisivätkin tulemaan. Jos heidän apuaan tarvitaan, kysy heiltä suoraan erikseen.</div>
+        </div>
+        <div class="person-card">
+          <div class="pname">Martta (JKL)</div>
+          <div class="pnote">Jos Jyväskylän tiimistä vain Martta pääsee, hän voi kutsua siskonsa Kertun pariksi. Kysy Martalta suoraan pääseekö Kerttu.</div>
+        </div>
+        <div class="person-card">
+          <div class="pname">Matilda (Oulu)</div>
+          <div class="pnote">Viettää kesää Seinäjoella → voi vetää tunteja siellä.</div>
+        </div>
+        <div class="person-card">
+          <div class="pname">Hanna (JKL)</div>
+          <div class="pnote">Viettää kesää Turussa → voi vetää tunteja siellä.</div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Sinun tavoitettavuutesi:</strong> Jos tiedät etukäteen päiviä jolloin et ole tavoitettavissa, ilmoita tiimille hyvissä ajoin. Joku muu tiimistä voi hoitaa viestittelyn puolestasi, jotta prosessit eivät veny.
+      </div>
+    </section>
+
+    <!-- ─ PENTULISTA ─ -->
+    <section id="pentulista">
+      <h2><span class="icon">🤖</span> AI-pentulistan käyttö vaihe vaiheelta</h2>
+      <ol class="steps">
+        <li>Pentulista päivittyy automaattisesti joka päivä <strong>klo 7:00</strong>. Uudet pentueet lisätään ja jo luovutetut poistetaan.</li>
+        <li>Tekoäly suodattaa pentueet kriteerien mukaan, mutta <strong>tuplavarmista aina itse</strong> että pentue sopii (ks. kriteerit yllä).</li>
+        <li>Jos pentue sopii, tarkista Excelistä onko kasvattajaan oltu yhteydessä aiemmin. Käytä hakua (<code>Cmd+F</code> tai <code>Ctrl+F</code>) kasvattajan sukunimellä ja kennelnimellä.</li>
+        <li>Jos kasvattajaan ei ole oltu yhteydessä aiemmin → lähetä sähköposti.</li>
+        <li>Jos kasvattaja ei vastaa muutaman päivän kuluessa → soita.</li>
+      </ol>
+    </section>
+
+    <!-- ─ GMAIL-VINKIT ─ -->
+    <section id="gmailvinkit">
+      <h2><span class="icon">📧</span> Gmail-vinkit ennen kuin aloitat</h2>
+
+      <div class="gmail-tip">
+        <strong>Tunnisteet – kuka vastaa kasvattajalle?</strong>
+        <p style="margin-top:0.4rem;">Kun olet lähettänyt viestin kasvattajalle, lisää lähetetylle viestille tunniste omalla nimelläsi (esim. <code>SILVIA</code>). Näin kun kasvattaja vastaa, kaikki näkevät heti kenen vastuulla on jatkaa keskustelua. Tiloille on oma tunniste: <code>TILAT</code>.</p>
+        <p style="margin-top:0.4rem;">Tunnisteet löytyvät Gmailin vasemmasta valikosta kohdasta <strong>Tunnisteet</strong>. Lisäät tunnisteen avaamalla viestin → kolme pistettä (⋮) → Tunniste.</p>
+      </div>
+
+      <div class="gmail-tip">
+        <strong>Viestipohjat – älä kirjoita alusta</strong>
+        <p style="margin-top:0.4rem;">Uutta viestiä kirjoittaessa paina viesti-ikkunan oikeassa alakulmassa olevaa <strong>kolmea pistettä (⋮)</strong> → valitse <strong>Mallit</strong>. Sieltä löydät kaikki Lavlyn valmiit viestipohjat. Paina haluamasi pohja ja se ilmestyy suoraan viestiisi – muokkaa vain kasvattajan nimi ja kaupunki.</p>
+      </div>
+    </section>
+
+    <!-- ─ VIESTIPOHJA 1 ─ -->
+    <section id="viestipohja1">
+      <h2><span class="icon">✉️</span> Viestipohja 1 – Pop-up-kaupungit</h2>
+
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title">Milloin lähetetään?</div>
+        <ul class="bullets">
+          <li><strong>Ei lähetetty</strong> → lähetä viesti</li>
+          <li><strong>Lähetetty yli kuukausi sitten, ei vastausta, Excelissä "viesti lähetetty"</strong> (ei soitettu) → lähetä uudelleen</li>
+          <li><strong>Lähetetty yli kuukausi sitten, ei vastausta, mutta Excelissä merkintä soitettu</strong> → toimi tilanteen mukaan ja lue Excelin muistiinpanot</li>
+        </ul>
+      </div>
+
+      <div class="msg-note">Muokkaa vain kasvattajan nimi ja kaupunki. Älä lisää emojeja tähän viestiin.</div>
+      <div class="msg-template">
+        <div class="msg-header">
+          <span>Aihe: Yhteistyö idea Lavlyn kanssa</span>
+          <button class="copy-btn" onclick="copyMsg('msg1')">Kopioi</button>
+        </div>
+        <div class="msg-body" id="msg1">Moikka [kasvattajan nimi],
+
+Olemme Lavly ja järjestämme ihanaa pentujoogaa! Olemme toimineet syksystä 2024 lähtien Tampereella ja hyvän vastaanoton seurauksena järjestämme laajasti eri kaupungeissa pentujoogatunteja.
+
+Nyt etsimme yhteistyöstä kiinnostuneita koirankasvattajia, joiden kanssa päästäisiin toteuttamaan pentujoogatunteja (kaupungissa X).
+
+Mikä ihme on pentujooga?
+
+Lyhyesti pentujooga on iloinen ja turvallinen seikkailu pennuillesi!
+
+Järjestämme rauhallisia joogatunteja, joissa pennut ovat mukana temmeltämässä ja jakamassa hyvän mielen fiilistä. Joogatunnille osallistuvat ihmiset pääsevät joogamatolle rentouttamaan kehoa samalla, kun pennut liikkuvat vapaasti tilassa. Pennuille on luvassa juoksentelua, leikkiä, silittelyä, nukkumista ja lempeää läsnäoloa.
+
+Tämä on ainutlaatuinen mahdollisuus pennuille kohdata uusia ihmisiä, tiloja ja kokemuksia turvallisessa ympäristössä. Lukuisat kasvattajat ovat kokeneet pentujoogan erittäin hyödylliseksi osaksi pentujen varhaista sosiaalistamista, sillä pennut osallistuvat meidän tunneille 5–8 viikon iässä. Joogatunnilla pennut tuovat esiin persoonallisuuspiirteitä yksilöinä uudessa tilanteessa, mikä voi myös auttaa sinua kasvattajana valitsemaan pennulle sopivimman kodin.
+
+Mukaan helposti ja vaivattomasti!
+
+Pentujoogaan ei suinkaan tarvitse sitoutua pitkäksi aikaa, vaan järjestämme tunteja kertaluontoisesti. Olemme suunnitelleet yhteistyön mahdollisimman vaivattomaksi, joten voit lähteä mukaan helposti ja matalalla kynnyksellä. Järjestämme kaiken valmiiksi, joten teille sekä pennuille jäljelle jää vain päivän sopiminen ja paikalle saapuminen!
+
+Haluaisimme kuulla, millaisia ajatuksia pentujooga sinussa herättää ja voisiko se olla kiva kokemus myös sinun pennuille?
+
+Jos yhteistyön idea kuulostaa mielenkiintoiselta, kerromme mielellämme lisää itsestämme, toiminnastamme ja yhteistyön yksityiskohdista! Samalla olisi ihana kuulla lisää myös sinusta.
+
+Lämpimin terveisin,
+Lavlyn tiimi! 🩷</div>
+      </div>
+    </section>
+
+    <!-- ─ VIESTIPOHJA 2 ─ -->
+    <section id="viestipohja2">
+      <h2><span class="icon">✉️</span> Viestipohja 2 – Lavlyn toimipistekaupungit</h2>
+      <div class="msg-note">Sama ohjeistus kuin edellisessä. Muokkaa vain kasvattajan nimi ja oikea kaupunki. Älä lisää emojeja.</div>
+      <div class="msg-template">
+        <div class="msg-header">
+          <span>Aihe: Yhteistyö idea Lavlyn kanssa</span>
+          <button class="copy-btn" onclick="copyMsg('msg2')">Kopioi</button>
+        </div>
+        <div class="msg-body" id="msg2">Moikka [kasvattajan nimi],
+
+Olemme Lavly ja järjestämme ihanaa pentujoogaa!
+
+Nyt etsimme yhteistyöstä kiinnostuneita koirankasvattajia, joiden kanssa päästäisiin toteuttamaan pentujoogatunteja Tampereella / Lahdessa / Oulussa / Jyväskylässä / Seinäjoella.
+
+Mikä ihme on pentujooga?
+
+Lyhyesti pentujooga on iloinen ja turvallinen seikkailu pennuillesi!
+
+Järjestämme rauhallisia joogatunteja, joissa pennut ovat mukana temmeltämässä ja jakamassa hyvän mielen fiilistä. Joogatunnille osallistuvat ihmiset pääsevät joogamatolle rentouttamaan kehoa samalla, kun pennut liikkuvat vapaasti tilassa. Pennuille on luvassa juoksentelua, leikkiä, silittelyä, nukkumista ja lempeää läsnäoloa.
+
+Tämä on ainutlaatuinen mahdollisuus pennuille kohdata uusia ihmisiä, tiloja ja kokemuksia turvallisessa ympäristössä. Lukuisat kasvattajat ovat kokeneet pentujoogan erittäin hyödylliseksi osaksi pentujen varhaista sosiaalistamista, sillä pennut osallistuvat meidän tunneille 5–8 viikon iässä. Joogatunnilla pennut tuovat esiin persoonallisuuspiirteitä yksilöinä uudessa tilanteessa, mikä voi myös auttaa sinua kasvattajana valitsemaan pennulle sopivimman kodin.
+
+Mukaan helposti ja vaivattomasti!
+
+Pentujoogaan ei suinkaan tarvitse sitoutua pitkäksi aikaa, vaan järjestämme tunteja kertaluontoisesti. Olemme suunnitelleet yhteistyön mahdollisimman vaivattomaksi, joten voit lähteä mukaan helposti ja matalalla kynnyksellä. Järjestämme kaiken valmiiksi, joten teille sekä pennuille jäljelle jää vain päivän sopiminen ja paikalle saapuminen!
+
+Haluaisimme kuulla, millaisia ajatuksia pentujooga sinussa herättää ja voisiko se olla kiva kokemus myös sinun pennuille?
+
+Jos yhteistyön idea kuulostaa mielenkiintoiselta, kerromme mielellämme lisää itsestämme, toiminnastamme ja yhteistyön yksityiskohdista! Samalla olisi ihana kuulla lisää myös sinusta.
+
+Lämpimin terveisin,
+Lavlyn tiimi! 🩷</div>
+      </div>
+    </section>
+
+    <!-- ─ VIESTIPOHJA 3 ─ -->
+    <section id="viestipohja3">
+      <h2><span class="icon">💬</span> Viestipohja 3 – Kasvattaja vastaa "kiinnostaa"</h2>
+      <div class="msg-note">Muokkaa aina kasvattajan vastauksen ja tilanteen mukaan. Pääpointit pysyvät aina. Tähän viestiin voi lisätä emojeja.</div>
+      <div class="msg-template">
+        <div class="msg-header">
+          <span>Jatkoviesti kiinnostuneelle kasvattajalle</span>
+          <button class="copy-btn" onclick="copyMsg('msg3')">Kopioi</button>
+        </div>
+        <div class="msg-body" id="msg3">Moikka [kasvattajan nimi],
+
+Kiitos nopeasta vastauksestasi, ihana kuulla! 😊
+
+[Valitse tilanteen mukaan:]
+"Tässä vähän lisää meidän toiminnasta ja yhteistyöstä 🐾"
+TAI
+"Aluksi voisin kertoa vähän lisää meidän toiminnasta ja yhteistyöstä! 🐾"
+
+--- TILAN SIJAINTI (pakollinen, valitse oikea kaupunki) ---
+
+Tampere: Pidämme tunteja Nekalassa, osoitteessa Viinikankatu 47. Tilaan on helppo saapua ja talon edestä löytyy ilmaisia parkkipaikkoja. Pidämme tunnit yleensä arki-iltaisin klo 17 alkaen tai viikonloppuisin joustavasti kasvattajan aikataulujen mukaan.
+
+Jyväskylä: Tilamme sijaitsee Kuokkalassa, osoitteessa Polttolinja 27, 40520 Jyväskylä. Tilaamme on helppo saapua ja alueella on ilmaisia parkkipaikkoja. Pidämme tunnit yleensä arki-iltaisin klo 17 alkaen tai viikonloppuisin joustavasti kasvattajan aikataulujen mukaan.
+
+Oulu: (Etsimme parhaillaan uutta tilaa.)
+
+Seinäjoki: Pidämme tunnit Torikeskuksessa, osoitteessa Kauppatori 1–3, 60100 Seinäjoki. Toimitilanne sijaitsee ensimmäisessä kerroksessa heti sisäänkäynnin vieressä. Pidämme tunnit yleensä perjantai-iltaisin klo 17 alkaen tai viikonloppuisin joustavasti kasvattajan ja tilan aikataulujen mukaan.
+
+Lahti: Pidämme tunteja Hennalassa, osoitteessa Pataljoonankatu 1, 15700 Lahti. Tilaan on helppo saapua ja pihasta löytyy ilmaisia parkkipaikkoja. Pidämme tunnit yleensä arki-iltaisin klo 17 alkaen tai viikonloppuisin joustavasti kasvattajan aikataulujen mukaan.
+
+Joensuu: Pidämme tunteja osoitteessa Kauppakatu 15 A 1, 80100 Joensuu (Joogastudio Kindly). Pidämme tunnit yleensä arki-iltaisin klo 17 alkaen tai viikonloppuisin joustavasti kasvattajan aikataulujen mukaan.
+
+--- LISÄPÄTKÄ (lisää tarvittaessa, esim. kultsu-pentue + Jyväskylä) ---
+Ihan muutama viikko sitten tunneillamme vierailivat kultsut kennelistä GoldBern's – liitän videon, josta näet miltä tunneilla näytti.
+
+--- TURVALLISUUS JA TUNNIN KULKU (pakollinen) ---
+Joogan aikana pennut ovat aidatulla alueella, jossa ei ole mitään ylimääräistä – vain joogamatot ja ihmiset. Jooga on myös pennuille turvallinen: se suoritetaan lattiatasossa eikä ohjelmassa ole äkillisiä liikkeitä tai tasapainoasanoita.
+
+Yleensä järjestämme kaksi pentujoogatuntia kerrallaan, ja tuntien välissä on 30 minuutin lepotauko pennuille. Koko setti kestää kokonaisuudessaan noin 3 tuntia. Käytännössä yhteistyö vaatii sinulta vain pentujen kuljetuksen tilaan. Tuntien aikana kaksi meistä on paikalla: toinen ohjaa joogaa ja toinen seuraa pentuja ja siivoaa vahingot – joten sinä voit halutessasi joogata tai vain seurata pentujen meininkiä 🙂
+
+--- KORVAUS (pakollinen) ---
+Meillä on tapana tarjota kasvattajalle 50 € per joogatunti, eli normaalisti kahdesta tunnista palkkio on 100 €.
+
+--- ETÄVIERAILU KENNELISSÄ (pakollinen) ---
+Meillä on tapana vierailla kennelissä ennen yhteistyön alkua. Tässä tapauksessa voisimme toteuttaa vierailun etäyhteydellä – soiteltaisiin videopuhelu, tutustuttaisiin toisiimme ja koiriisi. Samalla voidaan jutella lisää yhteistyön yksityiskohdista ja vastaan kaikkiin kysymyksiisi.
+
+Miltä tämä kuulostaa? Olisiko sinulle sopiva videopuhelu lähipäivinä, ja milloin olisi hyvä ajankohta? Kesto yleensä max. 15 min.
+
+Terveisin,
+[Nimi] / Lavly</div>
+      </div>
+    </section>
+
+    <!-- ─ VIESTITYYLI ─ -->
+    <section id="viestityyli">
+      <h2><span class="icon">🎨</span> Viestityyli & allekirjoitukset</h2>
+      <div class="card">
+        <div class="card-title">Tyyli</div>
+        <p style="font-size:0.9rem;">Lämmin ja lempeä. Viestit ovat ystävällisiä ja helposti lähestyttäviä.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Sallitut emojit</div>
+        <p style="font-size:1.4rem;letter-spacing:0.2em;">🐾 🩷 ☺ 😊 😍 🥰 🐶</p>
+        <p style="font-size:0.82rem;color:var(--muted);margin-top:0.3rem;">Ei käytetä ensimmäisessä sähköpostiviestissä.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Allekirjoitusvaihtoehdot</div>
+        <p>Lämpimin terveisin, <em>Lavlyn tiimi! 🩷</em><br>
+        Terveisin, <em>[Nimi] / Lavly</em><br>
+        Terkuin, <em>[Nimi] / Lavly</em></p>
+        <p style="font-size:0.82rem;color:var(--muted);margin-top:0.5rem;">Sähköpostiin tulee myös automaattinen allekirjoitus – tarkista aina, että se on näkyvillä:<br>
+        <code>-- www.lavly.fi | Instagram | TikTok | Facebook</code></p>
+      </div>
+    </section>
+
+    <!-- ─ SOITTAMINEN ─ -->
+    <section id="soittaminen">
+      <h2><span class="icon">📞</span> Kasvattajille soittaminen</h2>
+      <p>Soita kasvattajalle, jos hän ei ole vastannut sähköpostiin <strong>2–3 päivän kuluessa</strong>.</p>
+      <div class="info-box">
+        <strong>Huom:</strong> Jos pennut ovat juuri syntyneet, älä ota yhteyttä heti. Odota, kunnes pennut ovat 1–2 viikon ikäisiä.
+      </div>
+
+      <h3>Mitä puhelussa käydään läpi:</h3>
+      <ol class="steps">
+        <li><strong>Aloitus:</strong> "Olemme laittaneet viestiä – oletko ehtinyt lukea sen läpi?"</li>
+        <li><strong>Mikä on pentujooga:</strong> Tila aidattu ja turvallinen · Jooga suoritetaan lattiatasolla, ei äkillisiä liikkeitä · Siivous hoidetaan itse · Pentujen ikä 5 vko+</li>
+        <li><strong>Mitä kasvattajalta vaaditaan:</strong> Kuljettaa pennut tilaan · Koko setti n. 3 tuntia (2×1 h + 30 min tauko) · Kasvattaja voi joogata tai vain seurata</li>
+        <li><strong>Korvaus:</strong> 100 € kahdesta tunnista (laskutus tai tilisiirto) · Jos matka 35 min+ → kilometrikorvaukset 0,20 €/km · Jos kasvattaja epäröi → tarjoa kilsat riippumatta sijainnista · <strong>Kirjaa aina ylös mitä olet luvannut!</strong></li>
+        <li><strong>Etävierailu:</strong> Sovi videopuhelu tutustumista varten (tai live-tapaaminen jos kasvattaja haluaa ja sijainti sopii)</li>
+      </ol>
+    </section>
+
+    <!-- ─ ETÄTAPAAMINEN ─ -->
+    <section id="etavierailu">
+      <h2><span class="icon">📹</span> Etätapaaminen (videopuhelu)</h2>
+      <p>Tapaaminen kestää yleensä maksimissaan <strong>15 minuuttia</strong>.</p>
+      <ul class="bullets" style="margin-bottom:1rem;">
+        <li><strong>Rotu (jos meille uusi):</strong> Onko luonteeltaan sosiaalinen? Nauttiiko olla ihmisten kanssa? Sopiiko kasvattajan mielestä rotu meidän tunneille?</li>
+        <li><strong>Kasvattajan tarina:</strong> Kuinka kauan kasvatustoimintaa? Miten päätyi rotuun? Montako aikuista koiraa? Onko pennuille kodit? Kuinka usein pentuja?</li>
+        <li><strong>Koirien arviointi:</strong> Katso silmämääräisesti, että kaikki vaikuttaa olevan kunnossa.</li>
+        <li><strong>Päivämäärät:</strong> Sovi alustava ajankohta tai palataan asiaan viestillä → etsitään sopiva päivä, tila ja tekijät.</li>
+      </ul>
+
+      <div class="card">
+        <div class="card-title">Kun tunti on lyöty lukkoon</div>
+        <p style="font-size:0.9rem;">Lähetä kasvattajalle viesti <strong>Business WhatsAppin</strong> kautta, jossa kerrot lyhyesti: sovittu päivämäärä ja aikataulu + lisäohjeet saapumiseen ja tunnille.</p>
+      </div>
+    </section>
+
+    <!-- ─ UKK ─ -->
+    <section id="ukk">
+      <h2><span class="icon">❓</span> UKK – Kasvattajien yleisimmät kysymykset</h2>
+      <div class="qa">
+        <div class="qa-item">
+          <div class="qa-q">"Onko pennuilla vakuutus?"</div>
+          <div class="qa-a">Ei ole vakuutusta, koska pennut eivät ole Lavlyn omaisuutta. Mitään ei ole koskaan sattunut.</div>
+        </div>
+        <div class="qa-item">
+          <div class="qa-q">"Miten siivous hoidetaan?"</div>
+          <div class="qa-a">Ennen tunteja ja niiden jälkeen desinfioidaan lattiat ja matot, pestään vesikupit. Asiakkaita ohjeistetaan pesemään kädet ja tulemaan puhtaissa vaatteissa.</div>
+        </div>
+        <div class="qa-item">
+          <div class="qa-q">"Onko teillä omia koiria?"</div>
+          <div class="qa-a">Kyllä! Katsulla on kaksi chihuahuaa, Olivialla cockapoo, Vilmalla villakoira, Polinalla cockeri, Adalla bostoninterrieri – ja muilla tiimiläisillä on myös koiria. Tunteja on vedetty syyskuusta 2024 lähtien ja kokemusta löytyy.</div>
+        </div>
+        <div class="qa-item">
+          <div class="qa-q">"Kaksi tuntia on liikaa!"</div>
+          <div class="qa-a">Tauko auttaa – pennuille on aina 30 min lepotauko tuntien välissä. Toimipistekaupungeissa voidaan pitää vain yksi tunti, jos kasvattaja niin haluaa.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─ TILAKYSELY ─ -->
+    <section id="tilakysely">
+      <h2><span class="icon">🏠</span> Tilan etsiminen uudelle kaupungille</h2>
+      <p>Jos järjestät pop-up-tuntia kaupungissa, jossa ei vielä ole tilaa, lähetä tilakysely potentiaalisille tiloille:</p>
+      <div class="msg-template">
+        <div class="msg-header">
+          <span>Tilakysely</span>
+          <button class="copy-btn" onclick="copyMsg('msg4')">Kopioi</button>
+        </div>
+        <div class="msg-body" id="msg4">Moikka!
+
+Järjestämme pentujoogaa ympäri Suomen ja nyt meillä on suunnitteilla pop-up-tunti [kaupungissa], mitä varten etsimme sopivaa tilaa. Tunneilla pennut ovat rajatulla alueella ja siivoamme jatkuvasti sotkuja. Siivoamme tilan aina huolella tuntien jälkeen.
+
+Yleensä pidämme kaksi asiakastuntia kerrallaan ja tarvitsemme tilan noin neljäksi tunniksi (sis. valmistelut, tauko ja siivoukset).
+
+Olisiko tiloissanne mahdollista järjestää pentujoogaa ja mitä vuokra maksaisi meille?
+
+Tunnit voisivat olla esimerkiksi [päivämäärä/ajankohta]. Miltä teidän aikataulut näyttää silloin?
+
+Ystävällisin terveisin,
+[Nimi] / Lavly</div>
+      </div>
+    </section>
+
+    <!-- ─ TILAT ─ -->
+    <section id="tilat">
+      <h2><span class="icon">📍</span> Tilat kaupungeittain</h2>
+      <div class="venue-grid">
+
+        <div class="venue-card">
+          <div class="city">Tampere</div>
+          <div class="name">Sauna47</div>
+          <div class="addr">Viinikankatu 47, 33800 Tampere</div>
+          <div class="contact">📱 Business WA: Tuomo Järvinen +358 50 5098710</div>
+          <div class="note">Yleensä hyvin vapaa – katso ajanvarauskalenterista, varaus kalenterin kautta. Ei mieluiten pe- tai la-iltoja (Tuomon pyyntö).</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Jyväskylä</div>
+          <div class="name">Studio Diviona</div>
+          <div class="addr">Polttolinja 27, 40520 Jyväskylä</div>
+          <div class="contact">📱 Business WA: Paula +358 41 3174448</div>
+          <div class="note">Yleensä hyvin vapaa – kysy ja varaa WA:ssa.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Hämeenlinna</div>
+          <div class="name">Studio Nada</div>
+          <div class="addr">Palokunnankatu 9, 13100 Hämeenlinna (Wetterhoffin talo, 3. krs)</div>
+          <div class="contact">📧 brooke@studionada.fi / Brooke (viestittely englanniksi)</div>
+          <div class="note">Kysy vapaat spostitse. Yleensä vapaa viikonloppuisin.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Vaasa</div>
+          <div class="name">BamStudio</div>
+          <div class="addr">Tiilitehtaankatu 49, 65100 Vaasa</div>
+          <div class="contact">📧 info@bamstudio.fi</div>
+          <div class="note">Katso tuntikalenterista, kysy spostitse. Yleensä vapaa pe–su.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Lahti</div>
+          <div class="name">Studio Pesula</div>
+          <div class="addr">Pataljoonankatu 1, Lahti</div>
+          <div class="contact">📱 Business WA: Niina +358 40 7791929</div>
+          <div class="note">Yleensä hyvin vapaa – katso kalenteri ja laita WA-viesti.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Rauma</div>
+          <div class="name">Walimo</div>
+          <div class="addr">Kalliokatu 2, Rauma</div>
+          <div class="contact">📧 info@walimo.fi / Jenni</div>
+          <div class="note">Katso tuntikalenterista, kysy spostitse. Yleensä vapaa la–su.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Kotka (ensisijainen)</div>
+          <div class="name">Tanssistudio Alienta</div>
+          <div class="addr">Mariankatu 14, 48100 Kotka</div>
+          <div class="contact">📱 Business WA: Marika +358 40 7266793</div>
+          <div class="note">Kysy aina viestillä. Yleensä vapaa la–su.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Kotka (varatila)</div>
+          <div class="name">Flow Club</div>
+          <div class="addr">Kotkankatu 11 B, Kotka</div>
+          <div class="contact">📧 flowclubkotka@gmail.com</div>
+          <div class="note">Käytä jos Alienta on varattuna. Katso kalenteri, kysy spostitse.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Porvoo</div>
+          <div class="name">Jooga Porvoo</div>
+          <div class="addr">Rauhankatu 33, 2. krs, 06100 Porvoo</div>
+          <div class="contact">📧 susanna.maaniittu@outlook.com</div>
+          <div class="note">Katso tuntikalenterista, kysy spostitse.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Joensuu</div>
+          <div class="name">Studio Kindly</div>
+          <div class="addr">Kauppakatu 15 A 1, 80100 Joensuu</div>
+          <div class="contact">📧 info@studiokindly.fi / Hanna</div>
+          <div class="note">Katso tuntikalenterista, kysy spostitse.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Lappeenranta</div>
+          <div class="name">Kulta Wellness</div>
+          <div class="addr">–</div>
+          <div class="contact">📱 Business WA: Miina +358 40 5772383</div>
+          <div class="note">Katso tuntikalenterista, kysy aina viestillä.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Seinäjoki</div>
+          <div class="name">Torikeskuksen tila</div>
+          <div class="addr">Kauppatori 1–3, Seinäjoki</div>
+          <div class="contact">Ilmoita Katsulle jos tehdään tilavaraus</div>
+          <div class="note">Vapaa toistaiseksi aina.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Pori</div>
+          <div class="name">Konttori Luovat (alasali)</div>
+          <div class="addr">Pohjoisranta 11, 28100 Pori</div>
+          <div class="contact">Lavlyn IG – pyydä Adaa, Katsua tai Polskua kysymään</div>
+          <div class="note">Yleensä hyvin vapaa.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Hyvinkää</div>
+          <div class="name">Wildare</div>
+          <div class="addr">Hämeenkatu 21–23 (1. krs), 05800 Hyvinkää</div>
+          <div class="contact">Lavlyn IG – pyydä Adaa, Katsua tai Polskua kysymään</div>
+          <div class="note">Kesällä remppa – huonosti käytettävissä. Vaihtoehto: Duo Dance Collective (ei vielä kontaktoitu).</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Lohja</div>
+          <div class="name">ToeStar (discopallosali)</div>
+          <div class="addr">Suurlohjankatu 2, 08100 Lohja</div>
+          <div class="contact">📧 tanssiteatteri.toestar@gmail.com</div>
+          <div class="note">Katso kalenteri, kysy spostitse.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Imatra</div>
+          <div class="name">The Voima (valoisa sali)</div>
+          <div class="addr">Kertakaari 5, 55120 Imatra</div>
+          <div class="contact">📧 info@thevoima.fi / Noora</div>
+          <div class="note">Katso kalenteri, kysy spostitse.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Helsinki</div>
+          <div class="name">Studio Kontrol Z</div>
+          <div class="addr">Kiviaidankatu 2b, 00210 Helsinki</div>
+          <div class="contact">📧 studio@kontrolz.fi</div>
+          <div class="note">Yleensä hyvin vapaa – kysy spostitse.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Turku</div>
+          <div class="name">Studio Fon</div>
+          <div class="addr">Nahkurinkatu 8, 20100 Turku</div>
+          <div class="contact">📱 Business WA: Julia +358 45 1107937</div>
+          <div class="note">Kesällä lähes aina vapaa, syksyllä vain viikonloput. Kyselyt WA:ssa.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Kokkola</div>
+          <div class="name">Syvyys-sali</div>
+          <div class="addr">Mannerheiminaukio 7, 67100 Kokkola</div>
+          <div class="contact">📧 info@syvyys.fi / Monica</div>
+          <div class="note">Katso kalenteri, kysy spostitse.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Salo</div>
+          <div class="name">Salora Gym</div>
+          <div class="addr">Salorankatu 5–7, 24240 Salo</div>
+          <div class="contact">📧 info@saloragym.fi</div>
+          <div class="note">Ei vielä pidetty tunteja, mutta vuokraaminen onnistuu viikonloppuisin.</div>
+        </div>
+
+        <div class="venue-card">
+          <div class="city">Kouvola</div>
+          <div class="name">Studio WUM</div>
+          <div class="addr">Kouvolankatu 26, 45100 Kouvola</div>
+          <div class="contact">📱 Business WA: Iita-Lotta</div>
+          <div class="note">Yleensä hyvin vapaa.</div>
+        </div>
+
+        <div class="venue-card" style="border-style:dashed;background:var(--bg);">
+          <div class="city">Tila etsinnässä</div>
+          <div class="name">Oulu · Tornio · Kemi</div>
+          <div class="addr">Tilaa etsitään aktiivisesti.</div>
+          <div class="note">Savonlinna, Rovaniemi ja muut kaupungit: ei tiloja vielä – pitää etsiä!</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ─ TUNNUKSET ─ -->
+    <section id="tunnukset">
+      <h2><span class="icon">🔐</span> Sähköpostitunnukset</h2>
+      <div class="card">
+        <div class="card-title">Lavly sähköposti</div>
+        <p><strong>Osoite:</strong> pentujooga@lavly.fi</p>
+        <p><strong>Salasana:</strong> lavlynkasvattajat2026</p>
+      </div>
+    </section>
+
+    <!-- ─ KALENTERI ─ -->
+    <section id="kalenteri">
+      <h2><span class="icon">📅</span> Yhteinen kalenteri</h2>
+      <div class="card">
+        <div class="card-title">Lavlyn TeamUp-kalenteri</div>
+        <p>Muista lisätä uudet tunnit kalenteriin heti kun ajankohta on sovittu.</p>
+        <a href="https://teamup.com/ks6unn5xs5spdspby" target="_blank" style="display:inline-block;margin-top:0.5rem;background:var(--pink);color:#fff;padding:0.5rem 1rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:0.88rem;">Avaa kalenteri →</a>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script>
+  function copyMsg(id) {
+    const el = document.getElementById(id);
+    const text = el.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = el.parentElement.querySelector('.copy-btn');
+      btn.textContent = 'Kopioitu!';
+      setTimeout(() => btn.textContent = 'Kopioi', 2000);
+    });
+  }
+
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('nav a[href^="#"]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
